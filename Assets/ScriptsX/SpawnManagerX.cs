@@ -6,11 +6,17 @@ public class SpawnManagerX : MonoBehaviour
 {
     public GameObject enemyPrefab;
     float spawnRange = 9;
+    public int enemyCount;
+    public int waveNumber = 1;
+    public GameObject powerupPrefab;
+    private PlayerControllerX playerControllerScript;
+
     // Start is called before the first frame update
     void Start()
     {
-        
-        Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
+        Instantiate(powerupPrefab, GenerateSpawnPosition(), powerupPrefab.transform.rotation);
+        SpawnEnemyWave(waveNumber);
+        playerControllerScript = GameObject.Find("Player").GetComponent<PlayerControllerX>();
     }
 
     private Vector3 GenerateSpawnPosition()
@@ -20,9 +26,26 @@ public class SpawnManagerX : MonoBehaviour
         Vector3 randomPos = new Vector3(spawnPosX, 0, spawnPosZ);
         return randomPos;
     }
+
+    void SpawnEnemyWave(int enemiesToSpawn)
+    {
+        for(int i = 0; i < enemiesToSpawn; i++)
+        {
+            Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
+        }
+    }
     // Update is called once per frame
     void Update()
     {
-        
+        if (playerControllerScript.gameOver == false)
+        {
+            enemyCount = FindObjectsOfType<Enemy>().Length;
+            if (enemyCount == 0)
+            {
+                waveNumber++;
+                SpawnEnemyWave(waveNumber);
+                Instantiate(powerupPrefab, GenerateSpawnPosition(), powerupPrefab.transform.rotation);
+            }
+        }
     }
 }
